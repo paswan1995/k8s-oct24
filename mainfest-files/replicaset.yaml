@@ -1,0 +1,41 @@
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: spc-rs
+  labels:
+    app: spc
+    version: v5.55
+spec:
+  minReadySeconds: 5
+  replicas: 2
+  selector:
+    matchLabels:
+      app: spc-build
+  template:
+    metadata:
+      labels:
+        app: spc-build 
+    spec:
+      containers:
+        - name: spc-c
+          image: redfiree/spc-project
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              memory: 500Mi
+              cpu: 500m  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spc-svc
+spec:
+  selector:
+    app: spc-build
+  ports:
+    - name: spc
+      port: 80
+      targetPort	: 8080
+      protocol: TCP
