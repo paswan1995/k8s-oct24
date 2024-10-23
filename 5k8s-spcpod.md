@@ -166,6 +166,40 @@ spec:
   ports:
     - port: 8080
       targetPort: 8080
+---
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: spc-rs
+  labels:
+    app: spc
+spec:
+  minReadySeconds: 5
+  replicas: 2
+  selector:
+    matchLabels:
+      app: spc
+      env: dev
+  template:
+    metadata:
+      labels:
+        app: spc
+        env: dev
+        version: v1.6.9
+    spec:
+      containers:
+        - name: spc
+          image: redfiree/spc-project
+          ports:
+            - containerPort: 8080
+          resources:
+            request:
+              memory: 128Mi
+              cpu: 100m
+            limits:
+              memory: 300Mi
+              cpu: 500m
 ```
 
 
