@@ -1,0 +1,46 @@
+---
+apiVersion: apps/v1
+kind: ReplicaSet 
+metadata:
+  name: users-svc-rs
+spec:
+  minReadySeconds: 5
+  replicas: 1
+  selector:
+    matchLabels:
+      app: users
+  template:
+    metadata:
+      labels:
+        app: users 
+    spec:
+      containers:
+        - name: users-svc-c
+          image: redfiree/libuserssvc:1.0
+          env:
+            - name: DATABASE_URL
+              value:  "postgresql://user:password@usersdb-svc:5432/usersdb"
+            - name: SECRET_KEY
+              value: "YtDEVWnL35aAIP-5yxeLjAZ49R920-mMNDfwPyWULu63HFsYzo0f-LO2InxC8eu428k"
+          ports:
+            - containerPort: 8000
+          resources:
+            requests:
+              memory: 128M
+              cpu: 125m 
+            limits:
+              memory: 256M 
+              cpu: 250m 
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: users-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: users
+  ports:
+  - port: 8000
+    targetPort: 8000

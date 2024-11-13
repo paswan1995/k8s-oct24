@@ -1,0 +1,50 @@
+apiVersion: apps/v1 
+kind: Deployment
+metadata: 
+  name: nginx-rs-depploy
+  namespace: qa
+spec:
+  minReadySeconds: 5
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx-deploy
+      version: v5.55
+  strategy:
+    rollingUpdate: 
+      maxSurge: 50%
+      maxUnavailable: 50%
+    type: "RollingUpdate"
+  template:
+    metadata:
+      name: nginx-pod
+      labels:
+        app: nginx-deploy
+        version: v5.55
+        namespace: qa
+    spec:
+      containers: 
+        - name: nginx-c
+          image: nginx
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              memory: 500Mi
+              cpu: 500m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+  namespace: qa
+spec:
+  selector:
+    app: nginx-deploy  
+    version: v5.55     
+  ports:
+    - protocol: TCP
+      port: 80          
+      targetPort: 8080  
+  type: ClusterIP       
+

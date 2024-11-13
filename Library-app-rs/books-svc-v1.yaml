@@ -1,0 +1,46 @@
+---
+apiVersion: apps/v1
+kind: ReplicaSet 
+metadata:
+  name: books-svc-rs
+spec:
+  minReadySeconds: 5
+  replicas: 1
+  selector:
+    matchLabels:
+      app: books
+  template:
+    metadata:
+      labels:
+        app: books 
+    spec:
+      containers:
+        - name: books-svc-c
+          image: redfiree/libbookssvc:1.0
+          env:
+            - name: DATABASE_URL
+              value:  "postgresql://user:password@booksdb-svc:5432/booksdb"
+            - name: SECRET_KEY
+              value: "YtDEVWnL35aAIP-5yxeLjAZ49R920-mMNDfwPyWULu63HFsYzo0f-LO2InxC8eu428k"
+          ports:
+            - containerPort: 8000
+          resources:
+            requests:
+              memory: 128M
+              cpu: 125m 
+            limits:
+              memory: 256M 
+              cpu: 250m 
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: books-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: books
+  ports:
+  - port: 8000
+    targetPort: 8000
