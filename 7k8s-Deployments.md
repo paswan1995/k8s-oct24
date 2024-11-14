@@ -34,6 +34,9 @@ To understand Deployments
 ![preview](images/70.png)
 
 *  Lets create a Deployment with 4 replicas of version 1.0 with a service exposed to external world 
+
+* # `kubectl roullout --help`
+
 ```yaml
 ---
 apiVersion: apps/v1
