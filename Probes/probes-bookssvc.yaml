@@ -1,0 +1,72 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bookssvc-deploy
+  annotations:
+    kubernetes.io/change-cause: "version v1.0"
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  selector:
+    matchLabels:
+      app: books
+  template:
+    metadata:
+      labels:
+        app: books 
+    spec:
+      containers:
+        - name: books-svc-c
+          image: redfiree/libbookssvc:1.0
+          envFrom:
+            - secretRef:
+                name: bookssvc-deploy-Secret
+          ports:
+            - containerPort: 8000
+          resources:
+            requests:
+              memory: 128M
+              cpu: 125m 
+            limits:
+              memory: 256M 
+              cpu: 250m 
+          livenessProbe:
+            initialDelaySeconds: 3
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+            tcpSocket:
+              port: 8000
+          readinessProbe:
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+            httpGet:
+              path: /docs
+              port: 8000
+          startupProbe:
+            initialDelaySeconds: 2
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - ps aux | grep uvicorn          
+          
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: books-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: books
+  ports:
+  - port: 8000
+    targetPort: 8000

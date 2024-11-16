@@ -1,0 +1,46 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: userssvc-deploy
+  annotations:
+    kubernetes.io/change-cause: "version v1.0"
+spec:
+  minReadySeconds: 5
+  replicas: 1
+  selector:
+    matchLabels:
+      app: users
+  template:
+    metadata:
+      labels:
+        app: users 
+    spec:
+      containers:
+        - name: users-svc-c
+          image: redfiree/libuserssvc:1.0
+          envFrom:
+            - configMapRef:
+                name: userssvc-deploy-config
+          ports:
+            - containerPort: 8000
+          resources:
+            requests:
+              memory: 128M
+              cpu: 125m 
+            limits:
+              memory: 256M 
+              cpu: 250m 
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: users-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: users
+  ports:
+  - port: 8000
+    targetPort: 8000
