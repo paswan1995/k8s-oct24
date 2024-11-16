@@ -21,7 +21,7 @@
     * You can inject values from a ConfigMap into a container's `command` and `args` fields, which are the entrypoint and arguments passed to the container when it starts. 
     * Example:
        * Let's say you have a ConfigMap called my-config with a key-value pair like this: 
-  ```
+  ```yaml
   apiVersion: v1
   kind: ConfigMap
   metadata:
@@ -54,7 +54,7 @@
   
   * You can use a ConfigMap to set environment variables in your container. This way , your application can read configuration values from environment variables.
   
-``` 
+```yaml 
 apiVersion: v1
 kind: Pod
 metadata:
@@ -87,7 +87,7 @@ spec:
   
      * Let's assume you have the following ConfigMap:  
 
-```
+```yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -156,7 +156,7 @@ if __name__ == "__main__":
 
 * Example Pod definition with a service account and RBAC permissions:
 
-```
+```yaml
 apiVersion: v1
 kind: Pod
 metadata:
@@ -301,7 +301,7 @@ spec:
 
 * Examples
 
-```
+```yaml
 ---
 apiVersion: apps/v1
 kind: Deployment
