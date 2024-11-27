@@ -17,8 +17,15 @@ export MY_DNS_LABEL="mydnslabel$RANDOM_ID"
 ```
 az aks create --resource-group $MY_RESOURCE_GROUP_NAME \
     --name $MY_AKS_CLUSTER_NAME \
-    --node-count 1 \
-    --generate-ssh-keys --node-vm-size 'Standard_B4ms'
+    --node-count 2 \
+    --generate-ssh-keys --node-vm-size 'Standard_B2ms'\
+
+    0r  # its work in free trail
+
+az aks create --resource-group $MY_RESOURCE_GROUP_NAME \
+    --name $MY_AKS_CLUSTER_NAME \
+    --node-count 2 \
+    --generate-ssh-keys --node-vm-size 'Standard_D2s_v3'
 ```
  
 # conneting to the cluster
@@ -29,6 +36,8 @@ az aks create --resource-group $MY_RESOURCE_GROUP_NAME \
 `echo "az aks get-credentials --resource-group $MY_RESOURCE_GROUP_NAME --name $MY_AKS_CLUSTER_NAME"`
 # run the output on power shell
  
+![preview](images/1.png)
+![preview](images/2.png)
 # to delete the cluster delete the resource group
 `az group delete --name $MY_RESOURCE_GROUP_NAME --yes --no-wait`
  
