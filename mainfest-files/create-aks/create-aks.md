@@ -3,9 +3,9 @@
 # defining enviornment variables
 ```
 export RANDOM_ID="$(openssl rand -hex 3)"
-export MY_RESOURCE_GROUP_NAME="sampleAks$RANDOM_ID"
+export MY_RESOURCE_GROUP_NAME="aks_grp$RANDOM_ID"
 export REGION="centralindia"
-export MY_AKS_CLUSTER_NAME="myAKSCluster$RANDOM_ID"
+export MY_AKS_CLUSTER_NAME="aks1$RANDOM_ID"
 export MY_DNS_LABEL="mydnslabel$RANDOM_ID"
 ```
 
@@ -14,13 +14,14 @@ export MY_DNS_LABEL="mydnslabel$RANDOM_ID"
  
 # creating AKS Cluster with new key
 # here you can increase the nodes and size of the vm
+
 ```
 az aks create --resource-group $MY_RESOURCE_GROUP_NAME \
     --name $MY_AKS_CLUSTER_NAME \
     --node-count 2 \
     --generate-ssh-keys --node-vm-size 'Standard_B2ms'\
 
-    0r  # its work in free trail
+    0r its work in free tier
 
 az aks create --resource-group $MY_RESOURCE_GROUP_NAME \
     --name $MY_AKS_CLUSTER_NAME \
@@ -38,6 +39,15 @@ az aks create --resource-group $MY_RESOURCE_GROUP_NAME \
  
 ![preview](images/1.png)
 ![preview](images/2.png)
+
+#  
+```
+$ kubectl version
+Client Version: v1.31.2
+Kustomize Version: v5.4.2
+Server Version: v1.30.6
+
+```
 # to delete the cluster delete the resource group
 `az group delete --name $MY_RESOURCE_GROUP_NAME --yes --no-wait`
  

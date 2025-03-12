@@ -1,0 +1,52 @@
+---
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: books-svc-secret
+  annotations: 
+    kubernetes.io/change-cause: "version v1.0"
+spec:
+  minReadySeconds: 10
+  replicas: 2
+  selector: 
+    matchLabels: 
+      app: books-svc 
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: 
+      maxSurge: 50%
+      maxUnavailable: 50% 
+  template: 
+    metadata: 
+      labels:
+        app: books-svc
+    spec: 
+      containers: 
+        - name: books-svc-c 
+          image: redfiree/libbookssvc:1.0
+          ports: 
+            - containerPort: 8000 
+          resources: 
+            requests:
+              memory: 128M
+              cpu: 125m 
+            limits:
+              memory: 512M
+              cpu: 500m 
+          envFrom: 
+            - secretRef: 
+                name: books-svc-secret 
+
+---
+apiVersion: v1 
+kind: Service 
+metadata:
+  name: books-svc
+spec:
+  clusterIP: None
+  ports: 
+    - port: 8000
+      targetPort: 8000 
+  selector: 
+    app: books-svc
+  type: ClusterIP

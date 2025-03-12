@@ -1,0 +1,19 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata: 
+  name: Cronjob 
+spec: 
+  jobTemplate:
+    metadata:
+      labels:
+        app: c-job
+    spec:
+      selector:
+        matchLabels:
+          app: c-job
+      template: 
+        metadata:
+          labels:
+            app: c-job
+      spec: 

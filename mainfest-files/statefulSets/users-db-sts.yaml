@@ -1,0 +1,64 @@
+# usersdb
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: usersdb-sts 
+spec:
+  minReadySeconds: 5
+  replicas: 2
+  selector:
+    matchLabels: 
+      db: users 
+  serviceName: usersdb-svc 
+  template: 
+    metadata: 
+      labels:
+        db: users
+    spec: 
+      containers: 
+        - name: usersdb-c 
+          image: postgres:15-alpine
+          ports: 
+            - containerPort: 5432
+          envFrom: 
+            - secretRef: 
+                name: usersdb-secret
+          resources: 
+            requests:
+              memory: "128Mi"  # Changed to "Mi" for mebibytes
+              cpu: "150m" 
+            limits: 
+              memory: "256Mi"  # Changed to "Mi" for mebibytes
+              cpu: "500m" 
+          volumeMounts: 
+            - name: usersdb-vol 
+              mountPath: /var/lib/postgresql/data
+              subPath: data 
+
+  volumeClaimTemplates:
+    - metadata:
+        name: usersdb-vol
+      spec:
+        accessModes: 
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: "1Gi"  # Added quotes for consistency
+        storageClassName: managed  # Correct placement of storageClassName
+
+---
+apiVersion: v1 
+kind: Service 
+metadata:
+  name: usersdb-svc 
+spec:
+  type: ClusterIP
+  clusterIP: None 
+  selector:
+    db: users 
+  ports: 
+    - port: 5432
+      targetPort: 5432
+ 
