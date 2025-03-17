@@ -44,3 +44,55 @@ spec:
   ports:
   - port: 8000
     targetPort: 8000
+
+
+# second yaml file for revision 
+---
+apiVersion: apps/v1
+kind: ReplicaSet 
+metadata:
+  name: users-service-rs 
+spec:
+  minReadySeconds: 15 
+  replicas: 2
+  selector:
+    matchLabels:
+      app: users-service 
+  template:
+    metadata:
+      labels:
+        app: users-service
+    spec:
+      containers: 
+        - name: users-service-c 
+          env: 
+            - name: DATABASE_URL
+              value: "postgresql:user:password@usersdb-svc:5432/usersdb"
+            - name: SECRET_KEY
+              value: "YtDEVWnL35aAIP-5yxeLjAZ49R920-mMNDfwPyWULu63HFsYzo0f-LO2InxC8eu428k"
+          image: shaikkhajaibrahim/libuserssvc:1.0
+          ports: 
+            - name: users-service-p
+              containerPort: 8000
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+
+---
+apiVersion: v1 
+kind: Service 
+metadata:
+  name: users-service-svc 
+spec:
+  type: ClusterIP
+  selector: 
+    app: users-service
+  ports: 
+    - name: users-service-p
+      port: 8000
+      targetPort: 8000
+
