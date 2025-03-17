@@ -188,6 +188,7 @@ spec:
 ![preview](images/55.png)
 ![preview](images/56.png)
 
+* refer: https://learn.microsoft.com/en-us/dotnet/architecture/cloud-native/introduce-eshoponcontainers-reference-app
 
 # Library Application
 
@@ -245,7 +246,17 @@ spec:
          * environmental variables: 
            * DATABASE_URL: “postgresql://:@:5432/“
            * SECRET_KEY: ‘YtDEVWnL35aAIP-5yxeLjAZ49R920-mMNDfwPyWULu63HFsYzo0f-LO2InxC8eu428k’
-       
+```YML
+1. to run users service 
+  image: 
+  environmental variables: 
+    * DATABASE_URL: "postgresql://
+	<POSTGRES_USER>:<POSTGRES_PASSWORD>@<name or ip of db container>:5432/<POSTGRES_DB>"
+           |             |                        |                 |        |
+           |             |                        |                 |        |
+      user name       postgres password       service name        port    postgre db name
+                                               
+```
        * port: 8000    
 
        * To run library webstore 
@@ -259,10 +270,13 @@ spec:
        
        ![preview](images/58.png)
 
+
 # First Version of Library:
 
+
   * Lets create a users database replicaset
-```
+
+```yaml
 ---
 apiVersion: apps/v1
 kind: ReplicaSet
@@ -315,7 +329,7 @@ spec:
 ```
   * Lets create a books database replicaset 
 
-```
+```yml
 ---
 apiVersion: apps/v1
 kind: ReplicaSet
@@ -367,7 +381,8 @@ spec:
       targetPort: 5432
 ```
 * Now lets create rs for users service and books service Refer Here for changes
-```
+
+```yml
 ---
 apiVersion: apps/v1
 kind: ReplicaSet 
@@ -417,7 +432,7 @@ spec:
 ```
 * bookssvc
 
-```
+```yml
 ---
 apiVersion: apps/v1
 kind: ReplicaSet 
@@ -466,7 +481,8 @@ spec:
     targetPort: 8000
 ```
 * Libstore app yaml manifest file  for frontend 
-```
+
+```yml
 ---
 apiVersion: apps/v1
 kind: ReplicaSet
