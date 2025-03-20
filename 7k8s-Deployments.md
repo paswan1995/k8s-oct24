@@ -160,7 +160,7 @@ spec:
 ![preview](images/72.png)
 
 * v2.0
-```
+```yml
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -211,7 +211,7 @@ spec:
     targetPort: 80
 ```
 * v3.0
-```
+```yml
 ---
 apiVersion: apps/v1
 kind: Deployment
