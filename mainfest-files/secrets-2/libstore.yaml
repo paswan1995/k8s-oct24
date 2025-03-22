@@ -1,0 +1,54 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: libstore-deploy
+  annotations:
+    kubernetes.io/changes-cause: "version v2.0"
+spec:
+  minReadySeconds: 10 
+  replicas: 2
+  selector: 
+    matchLabels:
+      app: libstore
+  strategy: 
+    type: RollingUpdate
+    rollingUpdate: 
+      maxSurge: 50%
+      maxUnavailable: 50%
+  template: 
+    metadata:
+      labels:
+        app: libstore
+        version: v2.0 
+    spec: 
+      containers:
+        - name: libstore-c 
+          image: shaikkhajaibrahim/libwebstore:1.0
+          envFrom: 
+            - secretRef: 
+                name: libstore-secret 
+          ports: 
+            - name: libstore-c 
+              containerPort: 3000
+          resources:
+            requests:
+              memory: 128Mi              
+              cpu: 125m                 
+            limits:
+              memory: 526Mi             
+              cpu: 500m 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: libstore-svc
+spec:
+  type: NodePort               # Exposes this service externally on a random high port (useful for testing).
+  selector:
+    app: libstore              # Matches pods with label `app=libstore`.
+  ports: 
+    - name: libstore-p         # Named port for clarity.
+      port: 80                 # Port exposed by the service for external clients.
+      targetPort: 3000 
+

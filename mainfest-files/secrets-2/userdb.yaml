@@ -1,0 +1,57 @@
+# usersdb.yaml
+# This file defines the deployment and service for the user database.
+
+---
+# Deployment for the user database.
+apiVersion: apps/v1
+kind: Deployment 
+metadata: 
+  name: userdb-deploy  
+spec:
+  minReadySeconds: 10   
+  replicas: 1           
+  selector: 
+    matchLabels: 
+      db: user           # Correctly matches the labels in the pod template
+  strategy:
+    type: RollingUpdate   
+    rollingUpdate: 
+      maxSurge: 50%       
+      maxUnavailable: 50% 
+  template:
+    metadata: 
+      labels:
+        db: user          # Correctly labels the pod
+        version: v2       
+    spec:
+      containers: 
+        - name: userdb-c   # Name of the container
+          image: postgres:15-alpine  
+          envFrom:
+            - secretRef: 
+                name: user-db-secret 
+          resources: 
+            requests: 
+              memory: 128Mi            
+              cpu: 250m                
+            limits:
+              memory: 256Mi           
+              cpu: 500m                
+          ports: 
+            - name: userdb-port        
+              containerPort: 5432      
+
+---
+# Service to expose the user database.
+apiVersion: v1 
+kind: Service 
+metadata:
+  name: userdb-svc           
+spec: 
+  type: ClusterIP             # Type of service (internal)
+  selector: 
+    db: user                  # Selector to match pods with the label "db: user"
+  ports:
+    - name: db-port           # Name of the port
+      port: 5432              # Port the service listens on
+      targetPort: 5432        # Port to forward traffic to on the pod

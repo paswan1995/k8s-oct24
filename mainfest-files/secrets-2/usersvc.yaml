@@ -1,0 +1,60 @@
+# userservice.yaml
+# This file defines the deployment and service for the user application.
+
+---
+# Deployment for the user application.
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  name: user-service-deploy   # Name of the deployment
+  annotations:
+    kubernetes.io/change-cause: "version v2.0" 
+spec:
+  minReadySeconds: 10         
+  replicas: 2                 
+  selector:
+    matchLabels:
+      app: user-service       # Selector to match pods with the label "app: user-service"
+  strategy:
+    type: RollingUpdate        
+    rollingUpdate:
+      maxSurge: 50%            
+      maxUnavailable: 50%      
+  template:
+    metadata:
+      labels:
+        app: user-service      # Label to identify this pod as a "user-service" application
+        version: v2.0          # Version of the application
+    spec:
+      containers:
+        - name: user-service-c   
+          image: shaikkhajaibrahim/libuserssvc:1.0 
+          envFrom:
+            - secretRef:
+                name: user-service-secret
+          ports:
+            - name: app-port         
+              containerPort: 8000   # Port that the container listens on.
+          resources:
+            requests:
+              memory: 128Mi         
+              cpu: 250m            
+            limits:
+              memory: 512Mi         
+              cpu: 500m             
+
+---
+# Service to expose the user application.
+apiVersion: v1 
+kind: Service 
+metadata:
+  name: userservice-svc      
+spec:
+  type: NodePort               # Type of service (external).
+  selector:
+    app: user-service          # Selector to match pods with label "app:user-service".
+  ports:
+    - name: userservice-port    
+      port: 8000                
+      targetPort: 8000          
+
