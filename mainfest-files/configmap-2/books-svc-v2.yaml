@@ -1,0 +1,55 @@
+# books-service.yaml
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: books-service-deploy
+  annotations: 
+    kubernetes.io/change-cause: "version v2.0"
+spec:
+  minReadySeconds: 10 
+  replicas: 2   # Two replicas for high availability of the application pods.
+  selector:
+    matchLabels:
+      app: books-service   # This must match the labels in the pod template.
+  strategy:
+    type: RollingUpdate 
+    rollingUpdate:
+      maxSurge: 50%
+      maxUnavailable: 50%
+  template:
+    metadata:
+      labels:
+        app: books-service   # Ensure this matches the selector above.
+        version: v2          # Version label for tracking purposes.
+    spec:
+      containers:
+        - name: books-service-container   # Name of your application container.
+          image: shaikkhajaibrahim/libbookssvc:1.0   # Correct image for your app.
+          envFrom:
+            - configMapRef:
+                name: books-service-config
+          resources:
+            requests:
+              memory: 128Mi 
+              cpu: 125m 
+            limits:
+              memory: 256Mi 
+              cpu: 400m 
+          ports:
+            - name: app-port               # Port exposed by the application container.
+              containerPort: 8000
+
+---
+apiVersion: v1 
+kind: Service 
+metadata:
+  name: booksservice-svc   # Service name for accessing the application externally.
+spec:
+  type: NodePort            # Exposing the service externally (useful for testing).
+  selector:
+    app: books-service      # Matches labels of Deployment pods above.
+  ports:
+    - name: app-port         # Port exposed by the service.
+      port: 8000             # External port clients will connect to.
+      targetPort: 8000       # Target port on the container running your app.
