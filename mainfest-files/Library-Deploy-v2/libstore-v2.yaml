@@ -1,0 +1,68 @@
+
+# libstore.yaml
+# This manifest defines the deployment and service for the "libstore" application.
+# Environment variables (`env`) are used to inject runtime configuration into the containerized application.
+# These variables allow the application to dynamically adapt to different environments (e.g., dev, staging, prod)
+# without modifying the code. They are particularly useful for:
+# - Configuring external service URLs (e.g., APIs, databases)
+# - Managing sensitive data like API keys or credentials (best stored in Kubernetes Secrets)
+# - Decoupling configuration from code for better portability and flexibility
+
+---
+apiVersion: apps/v1 
+kind: Deployment
+metadata: 
+  name: libstore-deploy
+  annotations:
+    kubernetes.io/change-cause: "version v2.0" 
+spec:
+  minReadySeconds: 10
+  replicas: 2   
+  selector:
+    matchLabels:
+      app: libstore 
+  strategy: 
+    type: RollingUpdate   
+    rollingUpdate: 
+      maxSurge: 50%       
+      maxUnavailable: 50% 
+  template:
+    metadata:
+      labels:
+        app: libstore     
+        version: v2.0     
+    spec: 
+      containers: 
+        - name: libstore-c
+          image: shaikkhajaibrahim/libwebstore:1.0 # Container image for the application. &  # These variables define external configurations needed by the app at runtime.
+          env:
+            - name: REACT_APP_BACKEND_API_URL
+              value: http://userservice-svc:8000/api/v1 # URL for the backend API (user service). This allows the frontend to communicate with user-related APIs.
+            - name: REACT_APP_BOOKS_API_URL
+              value: http://booksservice-svc:8000/api/v1/books # URL for the books API. This enables the frontend to fetch book-related data.
+            - name: REACT_APP_USERS_API_URL
+              value: http://userservice-svc:8000/api/v1/users # URL for user-related APIs. This allows the frontend to fetch user-specific data.
+          ports:
+            - name: libstore-port         # Named port for clarity and easier reference.
+              containerPort: 3000         # Port on which the application runs inside the container.
+          resources:
+            requests:
+              memory: 128Mi              
+              cpu: 125m                 
+            limits:
+              memory: 526Mi             
+              cpu: 500m                  
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: libstore-svc
+spec:
+  type: NodePort               # Exposes this service externally on a random high port (useful for testing).
+  selector:
+    app: libstore              # Matches pods with label `app=libstore`.
+  ports: 
+    - name: libstore-p         # Named port for clarity.
+      port: 80                 # Port exposed by the service for external clients.
+      targetPort: 3000         # Port on the container that receives traffic from this service.

@@ -1,0 +1,57 @@
+# booksdb.yaml
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: booksdb-deploy
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  selector:
+    matchLabels:
+      db: books  # Ensure this matches the Service's selector
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 50%
+      maxUnavailable: 50%
+  template:
+    metadata:
+      labels:
+        db: books  # Ensure this matches the Service's selector
+        version: v2
+    spec:
+      containers:
+        - name: booksdb-c
+          image: postgres:15-alpine 
+          env: 
+            - name: POSTGRES_USER
+              value: user
+            - name: POSTGRES_PASSWORD
+              value: password
+            - name: POSTGRES_DB
+              value: booksdb
+          resources: 
+            requests: 
+              memory: 128Mi
+              cpu: 250m
+            limits:
+              memory: 256Mi 
+              cpu: 500m 
+          ports: 
+            - name: booksdb-port
+              containerPort: 5432
+
+---
+apiVersion: v1 
+kind: Service 
+metadata:
+  name: booksdb-svc  # Service name to be used in DATABASE_URL.
+spec: 
+  type: ClusterIP  # Internal service to expose the database within the cluster.
+  selector:
+    db: books       # Matches the labels of the database pods in Deployment above.
+  ports:
+    - name: db-port 
+      port: 5432       # Service port for PostgreSQL database access.
+      targetPort: 5432 # Target port on the container running PostgreSQL.
