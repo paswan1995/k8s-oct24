@@ -1,0 +1,100 @@
+---
+apiVersion: apps/v1
+kind: ReplicaSet 
+metadata:
+  name: books-svc-rs
+spec:
+  minReadySeconds: 5
+  replicas: 1
+  selector:
+    matchLabels:
+      app: books
+  template:
+    metadata:
+      labels:
+        app: books 
+    spec:
+      containers:
+        - name: books-svc-c
+          image: redfiree/libbookssvc:1.0
+          env:
+            - name: DATABASE_URL
+              value:  "postgresql://user:password@booksdb-svc:5432/booksdb"
+            - name: SECRET_KEY
+              value: "YtDEVWnL35aAIP-5yxeLjAZ49R920-mMNDfwPyWULu63HFsYzo0f-LO2InxC8eu428k"
+          ports:
+            - containerPort: 8000
+          resources:
+            requests:
+              memory: 128M
+              cpu: 125m 
+            limits:
+              memory: 256M 
+              cpu: 250m 
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: books-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: books
+  ports:
+  - port: 8000
+    targetPort: 8000
+
+
+# second yaml file for revision 
+
+---
+apiVersion: apps/v1
+kind: ReplicaSet 
+metadata:
+  name: books-service-rs 
+spec:
+  minReadySeconds: 15
+  replicas: 2 
+  selector:
+    matchLabels:
+      app: books-service
+  template:
+    metadata: 
+      labels:
+        app: books-service
+    spec:
+      containers: 
+        - name: books-service-c 
+          image: shaikkhajaibrahim/libbookssvc:1.0
+          env:
+            - name: DATABASE_URL
+              value: "postgresql://user:password@booksdb-svc:5432/booksdb"
+            - name: SECRET_KEY
+              value: "tDEVWnL35aAIP-5yxeLjAZ49R920-mMNDfwPyWULu63HFsYzo0f-LO2InxC8eu428k"
+          ports: 
+            - name: books-service-p 
+              containerPort: 8000
+          resources: 
+            requests:
+              memory: "256Mi"
+              cpu: "250m"        
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+
+--- 
+apiVersion: v1 
+kind: Service 
+metadata:
+  name: books-service-svc 
+spec:
+  type: ClusterIP
+  selector: 
+    app: books-service 
+  ports:
+    - name: books-service-p
+      port: 8000
+      targetPort: 8000 
+
+      

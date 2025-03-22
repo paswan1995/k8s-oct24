@@ -1,0 +1,104 @@
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: libstore-rs
+  labels:
+    app: libstore
+spec:
+  minReadySeconds: 5
+  replicas: 1
+  selector: 
+    matchLabels:
+      app: libstore 
+  template:
+    metadata:
+      labels:
+        app: libstore
+    spec:
+      containers:
+        - name: libstore-c
+          image: redfiree/libstore:1.0
+          env:
+            - name: REACT_APP_BACKEND_API_URL
+              value: http://users-svc:8000/api/v1
+            - name: REACT_APP_BOOKS_API_URL
+              value: http://books-svc:8000/api/v1/books 
+            - name: REACT_APP_USERS_API_URL
+              value: http://users-svc:8000/api/v1/users
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              memory: 128M 
+              cpu: 250m
+            limits:
+              memory: 500M 
+              cpu: 500m  
+
+---
+apiVersion: v1 
+kind: Service
+metadata:
+  name: libstore-svc 
+spec:
+  type: NodePort  #while using cloud you should give Loadbalancer instead of NodePort
+  selector: 
+    app: libstore
+  ports: 
+    - port: 80
+      targetPort: 3000 
+
+
+# second yaml file for revision 
+
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: libstore-rs
+spec:
+  minReadySeconds: 20
+  replicas: 2
+  selector: 
+    matchLabels:
+      app: libstore
+  template:
+    metadata: 
+      labels:
+        app: libstore
+    spec: 
+      containers: 
+        - name: libstore-c 
+          image: shaikkhajaibrahim/libwebstore:1.0
+          env:
+            - name: REACT_APP_BACKEND_API_URL
+              value: http://users-svc:8000/api/v1
+            - name: REACT_APP_BOOKS_API_URL
+              value: http://books-svc:8000/api/v1/books 
+            - name: REACT_APP_USERS_API_URL
+              value: http://users-svc:8000/api/v1/users
+          ports:
+            - name: libstore-p 
+              containerPort: 3000 
+          resources: 
+            requests:
+              memory: "256Mi"
+              cpu: "250m" 
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+       
+---
+apiVersion: v1 
+kind: Service
+metadata:
+  name: libstore-svc 
+spec:
+  type: NodePort
+  selector:
+    app: libstore
+  ports: 
+    - name: libstore-p 
+      port: 80
+      targetPort: 3000 
