@@ -321,7 +321,11 @@ spec:
     * users-service from replicaset to deployment
     * books-service from replicaset to deployment
     * library-web-store from replicaset to deployment   
-
+        * All deployments files are saved in manifest->Libray-Deploy-v2 folder
+![preview](images/93.png)
+![preview](images/94.png)
+![preview](images/95.png)
+![preview](images/96.png)
 
 # Annotations
   * refer here: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
