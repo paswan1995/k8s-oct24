@@ -1,7 +1,18 @@
-# ConfigMaps and Secrets
+# ConfigMaps and Secrets                                 23/Oct/2024
  
  * refer: https://kubernetes.io/docs/concepts/configuration/configmap/
- 
+
+ * There are four different ways that you can use a ConfigMap to configure a container inside a Pod:
+
+1. Inside a container command and args
+
+2. Environment variables for a container
+
+3. Add a file in read-only volume, for the application to read
+
+4. Write code to run inside the Pod that uses the Kubernetes API to read a ConfigMap
+
+
  * A ConfigMap is an API object used to store non-confidential data in key-value pairs.Pods can consume ConfigMaps as environment variables, command-line arguments, or as configuration files in a volume.
  
  * A ConfigMap allows you to decouple environment-specific configuration from your container images, so that your applications are easily portable.
@@ -93,7 +104,7 @@ kind: ConfigMap
 metadata:
   name: my-config
 data:
-  config.yaml: |
+  config.yaml: 
     database:
       host: db.example.com
       port: 3306
@@ -122,6 +133,12 @@ spec:
 # In this example, the config.yaml file will be available in the container at /etc/myapp/config.yaml as a read-only file.
 
 
+```
+# commands
+
+```
+kubectl exec user-db-rs-z9r38 --printenv 
+kubectl exec books-db-rs-f59br4 --printenv 
 ```
 
 * 4.Write code to run inside the Pod that uses the Kubernetes API to read a ConfigMap 
@@ -203,7 +220,11 @@ spec:
 
    * # `Configure Liveness, Readiness and Startup Probes` 
    
-   * Kubernetes has various types of probes: 
+   * Kubernetes has various types of probes(probes is not but a check): 
+
+  *  In k8s we have 3 types of Probes 
+      * Liveness Probe: 
+          * Determines  
 
 1. __Liveness probe__
    
@@ -375,3 +396,16 @@ spec:
   - port: 8000
     targetPort: 8000
 ```
+
+# command to check application is running or not 
+
+```
+kubectl get po
+kubectl exec -it user-service-rs-z9r38-th6v9 -- /bin/sh
+
+ps aux
+ps aux | grep uvicorn
+```
+# search
+  * how could i know my application is running or not or container
+  * what causes the failure application according to write probes
