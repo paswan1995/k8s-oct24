@@ -4,7 +4,7 @@
    
    * Daemonsets are used to run a pod on each node or selected nodes
    * Daemonset support rolling updates like deployments
-   * They are useful for running agent like  softwares in container  
+   * They are useful for running agent like softwares in container  
 
 * `so if i want to export logs of all nodes to aws cloud watch so on each node i need to have something running which will read those logs and send it to somewhere. so i don't need multiple i need 1 node 1 pod on every node or i need pod on any selected node for this kind of workloads we use Daemonset.` 
 
@@ -196,7 +196,7 @@ spec:
 
   2. # Unique Names Within a Namespace:
 
-     * Resources (like Pods or Services) must have unique names within a single namespace. For example, you can have a Pod named frontend in namespace A and another Pod named frontend in namespace B—because the names only need to be unique within the same namespace, not across namespaces.
+     * Resources (like Pods or Services) must have unique names within a single namespace. For example, you can have a Pod named frontend in namespace A and another Pod named frontend in namespace B because the names only need to be unique within the same namespace, not across namespaces.
 
   3. # Namespace Scoping:
 
