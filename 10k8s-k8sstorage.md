@@ -1,4 +1,5 @@
 # Kubernetes Storage
+25/Oct/2024
 
 * CSI is a storage interface for  k8s 
 * List of CSI drivers Refer Here: https://kubernetes-csi.github.io/docs/drivers.html   
@@ -246,4 +247,28 @@ For your DevOps interviews, focusing on how storage is dynamically provisioned, 
 
 * `Dynamic storage: means that whenever I need storage, Kubernetes will automatically provision it for me. Since we are widely using cloud environments, this allows for seamless and efficient management of storage resources.`
 
-* 
+* try to correct it and find it, what ut is ?
+```
+so can we comminicate from a pod to a service which is running in different namespaces 
+------------------------------
+= <service-name>.<namespaces>
+  users-svc.dev 
+  curl http://users-svc.dev 
+----------------------------------
+storage providers 
+cri - cni - csi driver
+statitic storage and dynamic storage 
+pod-pvc-sc-csidriver-pv
+----------------
+storage classes mode in k8s 
+-----------------------------
+
+persistence volume storage store 
+access mode 
+
+rwo = only one pod get a read write access only 1 node attach disk on a node , 
+rox= readonlyMany= in that vol
+ arwop = only 1 pod get read write access
+------------------
+findout what mysql cluster and how it is difference from single database
+```
