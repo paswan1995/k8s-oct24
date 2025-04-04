@@ -1,0 +1,31 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spc-svc
+spec:
+  selector:
+    type: NodePort
+    app: spc-build
+  ports:
+    - name: spc
+      port: 80
+      targetPort	: 8080
+      protocol: TCP
+
+# or
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spc-svc
+  labels:
+    app: spc
+spec:
+  type: NodePort
+  selector:
+    app: spc
+    env: dev
+  ports:
+    - port: 8080
+      targetPort: 8080

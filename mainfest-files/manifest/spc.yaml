@@ -1,0 +1,23 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: spc
+  labels:
+    app: spc
+    version: v5.55
+spec:
+  containers:
+    - name: spc-build
+      images: redfiree/spc-project 
+      resources:
+        requests:
+          memory: "128M"
+          cpu: "250m"
+        limits: 
+          memory: "512M"
+          cpu: "1"
+      ports:
+        - name: spc-c
+          containerPort: 8080
+          protocol: "TCP"
