@@ -272,3 +272,193 @@ rox= readonlyMany= in that vol
 ------------------
 findout what mysql cluster and how it is difference from single database
 ```
+
+
+
+# questions 
+
+* i wnat to use Azure storage account blob storage for my persistent volume how to do it?
+* how about using s3 eks cluster?
+* give me step by  step apporach to s3 storage as persistent volume in EKS cluster?
+* 
+
+* Here’s a step-by-step guide to using Azure Blob Storage and Amazon S3 as persistent volumes in Kubernetes clusters, including AKS and EKS.
+
+---
+
+## **Using Azure Blob Storage for Persistent Volumes in AKS**
+
+Azure Blob Storage can be integrated into AKS by using the Azure CSI driver. Below are the steps:
+
+### **1. Prerequisites**
+- Create an Azure Blob Storage account and container.
+- Ensure your AKS cluster is running.
+- Install the Azure Blob CSI driver:
+  ```bash
+  helm repo add blob-csi-driver https://raw.githubusercontent.com/kubernetes-sigs/blob-csi-driver/master/charts
+  helm install blob-csi-driver blob-csi-driver/blob-csi-driver --namespace kube-system
+  ```
+
+### **2. Create a Secret for Storage Account**
+Create a Kubernetes secret with your storage account credentials:
+```bash
+kubectl create secret generic azure-blob-secret --namespace default \
+  --from-literal=accountname= \
+  --from-literal=accountkey=
+```
+
+### **3. Define a Persistent Volume (PV)**
+Create a `pv-blob.yaml` file:
+```yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-blob
+spec:
+  capacity:
+    storage: 1Ti
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: azureblob-nfs-premium
+  csi:
+    driver: blob.csi.azure.com
+    volumeHandle: 
+    volumeAttributes:
+      resourceGroup: 
+      storageAccount: 
+      containerName: 
+      protocol: nfs
+```
+Apply the PV:
+```bash
+kubectl apply -f pv-blob.yaml
+```
+
+### **4. Create a Persistent Volume Claim (PVC)**
+Create a `pvc-blob.yaml` file:
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-blob
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: azureblob-nfs-premium
+```
+Apply the PVC:
+```bash
+kubectl apply -f pvc-blob.yaml
+```
+
+### **5. Use the PVC in a Pod**
+Create a pod manifest (`nginx-pod-blob.yaml`) that uses the PVC:
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-blob
+spec:
+  containers:
+    - name: nginx-container
+      image: nginx:latest
+      volumeMounts:
+        - mountPath: "/mnt/blob"
+          name: blob-storage-volume
+  volumes:
+    - name: blob-storage-volume
+      persistentVolumeClaim:
+        claimName: pvc-blob
+```
+Apply the pod manifest:
+```bash
+kubectl apply -f nginx-pod-blob.yaml
+```
+
+---
+
+## **Using Amazon S3 as Persistent Volume in EKS**
+
+Amazon S3 can be used as persistent storage in EKS by leveraging the Mountpoint for Amazon S3 CSI driver.
+
+### **1. Prerequisites**
+- Create an Amazon S3 bucket.
+- Ensure your EKS cluster is running.
+- Install the Mountpoint for Amazon S3 CSI driver.
+
+### **2. Install the CSI Driver**
+Install the driver using Helm or kubectl. Example with Helm:
+```bash
+helm repo add aws-ebs-csi-driver https://kubernetes-sigs.github.io/aws-ebs-csi-driver/
+helm install s3-csi-driver aws-ebs-csi-driver/aws-ebs-csi-driver --namespace kube-system
+```
+
+### **3. Create a Storage Class**
+Define a `storageclass.yaml` file for S3 storage class:
+```yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: s3-storageclass
+provisioner: s3.csi.aws.com # Provisioner for AWS S3 CSI Driver.
+parameters:
+  type: standard # Bucket type.
+```
+Apply it with:
+```bash
+kubectl apply -f storageclass.yaml
+```
+
+### **4. Create a Persistent Volume (PV)**
+Define an `s3-pv.yaml` file for the PV configuration:
+```yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: s3-pv
+spec:
+  capacity:
+    storage: 1Gi # Placeholder value; ignored by S3.
+  accessModes:
+    - ReadWriteMany # Supported modes.
+  csi:
+    driver: s3.csi.aws.com # Required driver.
+    volumeHandle: s3-volume-handle # Unique identifier.
+    volumeAttributes:
+      bucketName: 
+      region: 
+```
+Apply it with:
+```bash
+kubectl apply -f s3-pv.yaml
+```
+
+### **5. Create a Persistent Volume Claim (PVC)**
+Define an `s3-pvc.yaml` file for claiming the PV resource:
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: s3-pvc
+spec:
+  accessModes:
+    - ReadWriteMany # Supported modes.
+  resources:
+    requests:
+      storage: 1Gi # Placeholder value; ignored by S3.
+```
+Apply it with:
+```bash
+kubectl apply -f s3-pvc.yaml 
+```
+
+### **6. Use the PVC in a Pod**
+Define a pod manifest (`nginx-s3-pod.yaml`) that uses this PVC for mounting S3 storage into containers.
+```yaml 
+apiVersion: v1 
+kind Pod
+
