@@ -96,7 +96,7 @@ app: frontend
 topologyKey: "kubernetes.io/hostname"
 ```
 
-4. Taints and Tolerations
+4. **Taints and Tolerations**
    * __Taints:__ Applied to nodes to repel certain pods, setting constraints on which nodes can host which pods.
    
    * __Tolerations:__ Allow pods to “tolerate” taints, enabling them to be scheduled on tainted nodes.
@@ -149,6 +149,23 @@ app: frontend
    * Kubernetes allows using custom schedulers for unique workload requirements.
    * Useful for applications needing custom placement strategies, such as data locality.
 
+   * Real-World Examples
+      * GPU Workloads: Schedule AI/ML jobs on GPU-enabled nodes while considering GPU type, memory, and CUDA cores.
+       
+      * Cost Optimization: Use strategies like MostAllocated for better bin-packing and reduced cloud costs.
+
+      * Cloud Bursting: Provision jobs in external clouds if local resources are insufficient.
+
+   * Benefits of Custom Schedulers
+
+      * Tailored workload placement for unique requirements.
+
+      * Enhanced resource utilization and cost efficiency.
+
+      * Support for advanced scheduling strategies not available in the default scheduler.
+
+* Custom schedulers provide flexibility and control, making them essential for complex Kubernetes deployments in industries like AI/ML, finance, healthcare, and more
+
 # Here is a comparison of Cordon and Drain in Kubernetes in tabular form:
 
 Here is a comparison of **Cordon** and **Drain** in Kubernetes in tabular form:
@@ -170,12 +187,57 @@ Here is a comparison of **Cordon** and **Drain** in Kubernetes in tabular form:
 - Use **Drain** when you need to evict all workloads from a node to perform significant maintenance or shut it down safely.
 
 
----
-Answer from Perplexity: pplx.ai/share
+
 
 # Administrative Activity: Upgrading K8s clusters
 
-To address your query, here are detailed steps for migrating a Kubernetes cluster from version 1.27 to 1.31, backing up etcd and persistent volumes, upgrading AKS and EKS clusters, and upgrading GKE clusters.
+  **Self hosted** 
+
+   * Always go through release notes to figure out what has changed in the new version
+   * backup the etcd cluster and persistent volumes
+
+   * cordon the node
+   * drain the node
+
+   * upgrade by executing linux commands
+   * uncordon and make it available for scheduling
+
+ **Managed k8s cluster**
+
+   * [EKS](https://aws.amazon.com/eks/)
+
+Here is a detailed comparison of Amazon Elastic Kubernetes Service (EKS), Azure Kubernetes Service (AKS), and Google Kubernetes Engine (GKE) in tabular form:
+
+| **Feature/Aspect**           | **Amazon EKS**                                                                                  | **Azure AKS**                                                                                     | **Google GKE**                                                                                   |
+|-------------------------------|-----------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|
+| **Year Released**             | 2018                                                                                         | 2017                                                                                            | 2014                                                                                           |
+| **Ease of Use**               | Requires manual configuration for some features; integrates well with AWS ecosystem          | User-friendly interface with Azure Portal; seamless integration with Azure services             | Offers Autopilot mode for simplified management; deep integration with Google Cloud services    |
+| **Control Plane Cost**        | $0.10 per hour per cluster                                                                    | Free                                                                                            | Free for one zonal cluster; $0.10/hour for multi-zonal or regional clusters                     |
+| **Worker Node Management**    | Managed Node Groups simplify node provisioning and scaling                                    | Uses Virtual Machine Scale Sets (VMSS) for high availability and scaling                        | Offers both manual and automated node management; Autopilot mode manages nodes automatically    |
+| **Scaling Options**           | Horizontal Pod Autoscaler, Cluster Autoscaler                                                | Horizontal Pod Autoscaler, Cluster Autoscaler                                                   | Horizontal Pod Autoscaler, Cluster Autoscaler, Vertical Pod Autoscaler                         |
+| **Max Nodes per Cluster**     | 1,000                                                                                        | 1,000                                                                                           | 5,000                                                                                          |
+| **High Availability**         | Control plane is highly available across multiple zones                                       | High availability for worker nodes via VMSS; control plane lacks built-in HA                    | Regional clusters provide high availability for both control plane and worker nodes             |
+| **Kubernetes Upgrades**       | Manual upgrades for control plane and worker nodes                                           | Manual upgrades required                                                                        | Automated upgrades enabled by default                                                           |
+| **Integration with Cloud Services** | Deep integration with AWS tools like CloudWatch, IAM, and S3                                    | Integrates with Azure AD, Azure Monitor, and Azure DevOps                                        | Integrates with Google Cloud services like Stackdriver Monitoring and Config Connector          |
+| **Security Features**         | Supports IAM roles for service accounts; Pod Security Policies                               | Role-based access control (RBAC) integrated with Azure Active Directory                         | Native RBAC; integrates with Google Cloud IAM                                                   |
+| **Windows Container Support** | Supported                                                                                    | Supported                                                                                       | Supported                                                                                        |
+| **Monitoring Tools**          | AWS CloudWatch Container Insights                                                             | Azure Monitor                                                                                   | Google Cloud Operations Suite (formerly Stackdriver)                                            |
+| **Deployment Options**        | Primarily on AWS; supports hybrid setups via Outposts                                        | Primarily on Azure; supports hybrid and multi-cloud deployments via Azure Arc                   | Primarily on Google Cloud; supports hybrid deployments via Anthos                               |
+| **Cost Efficiency**           | Higher costs due to control plane charges; discounts available via Savings Plans or Reserved Instances  | Free control plane; costs depend on underlying Azure resources                                  | Competitive pricing for compute and storage; free tier for small clusters                       |
+| **Unique Features**           | Bare-metal node support; Elastic Fabric Adapter (EFA) for high-performance networking         | Integration with GitOps workflows using Azure DevOps pipelines                                  | Early access to Kubernetes features due to Google's involvement in Kubernetes development       |
+
+### Key Takeaways:
+1. **Amazon EKS**: Best suited for organizations heavily invested in AWS. Offers robust networking features but requires more manual configurations.
+2. **Azure AKS**: Ideal for those already using Microsoft Azure services. Provides ease of use through its portal but requires manual upgrades.
+3. **Google GKE**: The most mature service, offering advanced features like Autopilot mode and high scalability. Ideal for data-heavy or multi-cloud applications.
+
+The choice between these services depends on your existing cloud environment, workload requirements, and cost considerations.
+
+# [AKS vs EKS](https://www.pluralsight.com/resources/blog/cloud/aks-vs-eks-vs-gke-managed-kubernetes-services-compared)
+
+
+
+* To address your query, here are detailed steps for migrating a Kubernetes cluster from version 1.27 to 1.31, backing up etcd and persistent volumes, upgrading AKS and EKS clusters, and upgrading GKE clusters.
 
 ---
 
@@ -491,6 +553,18 @@ kubectl apply -f deployment.yaml
 ### **Helm**
 Helm is a package manager for Kubernetes that simplifies application deployment using charts.
 
+* search given below:  
+   * helm mysql replication / helm postgress cluster 
+   * Kustomize overlays for production and qa 
+   * simple helm chart 
+   **Layer 4  knoes only port n ip address**
+   * and Layer 7 Load balancer
+
+[Kustomize](https://www.densify.com/kubernetes-tools/kustomize/)
+
+
+
+
 #### **MySQL Replication in Helm**
 To deploy MySQL replication using Helm, you can use the Bitnami MySQL Helm chart:
 
@@ -563,9 +637,4 @@ Kustomize allows you to customize Kubernetes objects without modifying the origi
 spec
 
 ---
-
-
-
-  # git test
-
 
